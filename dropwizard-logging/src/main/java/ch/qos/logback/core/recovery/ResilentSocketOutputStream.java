@@ -8,15 +8,26 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+/**
+ * Represents a resilent persistent connection via TCP as an {@link OutputStream}.
+ * Automatically tries to reconnect to the server if it encounters errors during writing
+ * data via a TCP connection.
+ */
 public class ResilentSocketOutputStream extends ResilientOutputStreamBase {
-
-    private static final int BUFFER_SIZE = 1024;
 
     private final String host;
     private final int port;
     private final int connectionTimeoutMs;
     private final SocketFactory socketFactory;
 
+    /**
+     * Creates a new stream based on the socket configuration.
+     *
+     * @param host                The host or an IP address of the server.
+     * @param port                The port on the server which accepts TCP connections.
+     * @param connectionTimeoutMs The timeout for establishinf a new TCP connection
+     * @param socketFactory       The factory for customizing the client socket.
+     */
     public ResilentSocketOutputStream(String host, int port, int connectionTimeoutMs,
                                       SocketFactory socketFactory) {
         this.host = host;
@@ -39,8 +50,8 @@ public class ResilentSocketOutputStream extends ResilientOutputStreamBase {
     @Override
     OutputStream openNewOutputStream() throws IOException {
         final Socket socket = socketFactory.createSocket();
-        socket.setKeepAlive(true);
+        socket.setKeepAlive(true); // Prevent automatic closing of the connection during periods of inactivity.
         socket.connect(new InetSocketAddress(InetAddress.getByName(host), port), connectionTimeoutMs);
-        return new BufferedOutputStream(socket.getOutputStream(), BUFFER_SIZE);
+        return new BufferedOutputStream(socket.getOutputStream());
     }
 }
