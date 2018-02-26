@@ -10,6 +10,8 @@ import java.net.Socket;
 
 public class ResilentSocketOutputStream extends ResilientOutputStreamBase {
 
+    private static final int BUFFER_SIZE = 1024;
+
     private final String host;
     private final int port;
     private final int connectionTimeoutMs;
@@ -22,7 +24,7 @@ public class ResilentSocketOutputStream extends ResilientOutputStreamBase {
         this.connectionTimeoutMs = connectionTimeoutMs;
         this.socketFactory = socketFactory;
         try {
-            super.os = openNewOutputStream();
+            this.os = openNewOutputStream();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create a TCP connection to " + host + ":" + port, e);
         }
@@ -39,6 +41,6 @@ public class ResilentSocketOutputStream extends ResilientOutputStreamBase {
         final Socket socket = socketFactory.createSocket();
         socket.setKeepAlive(true);
         socket.connect(new InetSocketAddress(InetAddress.getByName(host), port), connectionTimeoutMs);
-        return new BufferedOutputStream(socket.getOutputStream());
+        return new BufferedOutputStream(socket.getOutputStream(), BUFFER_SIZE);
     }
 }
