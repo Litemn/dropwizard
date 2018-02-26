@@ -17,7 +17,7 @@ public class ResilentUdpSocketOutputStream extends ResilientOutputStreamBase {
         try {
             super.os = openNewOutputStream();
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to create a TCP connection to " + host + ":" + port, e);
+            throw new IllegalStateException("Unable to create an UDP connection to " + host + ":" + port, e);
         }
         this.presumedClean = true;
     }
